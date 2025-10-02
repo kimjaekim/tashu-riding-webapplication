@@ -72,6 +72,9 @@ Thumbs.db
 *.csv
 대슈 대여이력 정보/*
 
+# Learning projects (not part of main application)
+springStudy/
+
 # Logs
 logs/
 *.log
