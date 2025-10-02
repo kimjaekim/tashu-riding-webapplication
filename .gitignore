@@ -70,6 +70,7 @@ Thumbs.db
 # Large CSV files (exceed GitHub limits)
 대슈 대여이력 정보/
 *.csv
+대슈 대여이력 정보/*
 
 # Logs
 logs/
