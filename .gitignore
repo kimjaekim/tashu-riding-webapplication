@@ -67,6 +67,10 @@ Thumbs.db
 *.sqlite
 *.sqlite3
 
+# Large CSV files (exceed GitHub limits)
+대슈 대여이력 정보/
+*.csv
+
 # Logs
 logs/
 *.log
