@@ -1,0 +1,63 @@
+{
+  "name": "my-react-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+    "deploy:all": "git add . && git commit -m '자동 업데이트' && git push origin main && npm run deploy"
+  },
+  "homepage": "/",
+  "proxy": "http://192.168.0.219:8000",
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "node-fetch": "^3.3.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.62.0",
+    "react-router-dom": "^6.26.2",
+    "react-scripts": "5.0.1",
+    "yup": "^1.7.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.17",
+    "gh-pages": "^6.3.0",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14"
+  },
+  "description": "대전시 공공자전거 '타슈'의 웹 기반 대여 서비스 애플리케이션입니다.",
+  "main": "backend-proxy.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kimjaekim/upgrade_tasue.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kimjaekim/upgrade_tasue/issues"
+  }
+}
