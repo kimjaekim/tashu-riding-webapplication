@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.future.my.dao.BoardDAO">
+    
+    <!-- 커뮤니티 게시글 작성 -->
+    <insert id="insertBoard" parameterType="com.future.my.vo.BoardVO">
+        INSERT INTO TASHU_BOARD (
+            BOARD_ID, USER_ID, TITLE, CONTENT, CATEGORY, 
+            VIEW_COUNT, LIKE_COUNT, STATUS, CREATE_DATE, UPDATE_DATE
+        ) VALUES (
+            #{boardId}, #{userId}, #{title}, #{content}, #{category},
+            #{viewCount}, #{likeCount}, #{status}, 
+            TO_DATE(#{createDate}, 'YYYY-MM-DD HH24:MI:SS'), 
+            TO_DATE(#{updateDate}, 'YYYY-MM-DD HH24:MI:SS')
+        )
+    </insert>
+    
+    <!-- 커뮤니티 게시글 ID로 조회 -->
+    <select id="selectBoardById" parameterType="string" resultType="com.future.my.vo.BoardVO">
+        SELECT * FROM TASHU_BOARD WHERE BOARD_ID = #{boardId} AND STATUS = 'Y'
+    </select>
+    
+    <!-- 모든 커뮤니티 게시글 조회 (삭제되지 않은 것만) -->
+    <select id="selectAllBoards" resultType="com.future.my.vo.BoardVO">
+        SELECT * FROM TASHU_BOARD 
+        WHERE STATUS = 'Y' 
+        ORDER BY CREATE_DATE DESC
+    </select>
+    
+    <!-- 카테고리별 커뮤니티 게시글 조회 -->
+    <select id="selectBoardsByCategory" parameterType="string" resultType="com.future.my.vo.BoardVO">
+        SELECT * FROM TASHU_BOARD 
+        WHERE CATEGORY = #{category} AND STATUS = 'Y' 
+        ORDER BY CREATE_DATE DESC
+    </select>
+    
+    <!-- 사용자별 커뮤니티 게시글 조회 -->
+    <select id="selectBoardsByUserId" parameterType="string" resultType="com.future.my.vo.BoardVO">
+        SELECT * FROM TASHU_BOARD 
+        WHERE USER_ID = #{userId} AND STATUS = 'Y' 
+        ORDER BY CREATE_DATE DESC
+    </select>
+    
+    <!-- 커뮤니티 게시글 수정 -->
+    <update id="updateBoard" parameterType="com.future.my.vo.BoardVO">
+        UPDATE TASHU_BOARD SET
+            TITLE = #{title},
+            CONTENT = #{content},
+            CATEGORY = #{category},
+            STATUS = #{status},
+            UPDATE_DATE = TO_DATE(#{updateDate}, 'YYYY-MM-DD HH24:MI:SS')
+        WHERE BOARD_ID = #{boardId}
+    </update>
+    
+    <!-- 커뮤니티 게시글 삭제 (STATUS를 'N'으로 변경) -->
+    <update id="deleteBoard" parameterType="string">
+        UPDATE TASHU_BOARD SET
+            STATUS = 'N',
+            UPDATE_DATE = SYSDATE
+        WHERE BOARD_ID = #{boardId}
+    </update>
+    
+    <!-- 조회수 증가 (문의사항 제외) -->
+    <update id="incrementViewCount" parameterType="string">
+        UPDATE TASHU_BOARD SET
+            VIEW_COUNT = VIEW_COUNT + 1
+        WHERE BOARD_ID = #{boardId}
+        AND CATEGORY != 'QNA'
+    </update>
+    
+    <!-- 좋아요 수 증가 -->
+    <update id="incrementLikeCount" parameterType="string">
+        UPDATE TASHU_BOARD SET
+            LIKE_COUNT = LIKE_COUNT + 1
+        WHERE BOARD_ID = #{boardId}
+    </update>
+    
+    <!-- 좋아요 수 감소 -->
+    <update id="decrementLikeCount" parameterType="string">
+        UPDATE TASHU_BOARD SET
+            LIKE_COUNT = GREATEST(LIKE_COUNT - 1, 0)
+        WHERE BOARD_ID = #{boardId}
+    </update>
+    
+    <!-- 커뮤니티 게시글 검색 -->
+    <select id="searchBoards" parameterType="string" resultType="com.future.my.vo.BoardVO">
+        SELECT * FROM TASHU_BOARD 
+        WHERE (TITLE LIKE '%' || #{keyword} || '%' 
+               OR CONTENT LIKE '%' || #{keyword} || '%')
+        AND STATUS = 'Y' 
+        ORDER BY CREATE_DATE DESC
+    </select>
+    
+    <!-- 좋아요 추가 -->
+    <insert id="addLike">
+        INSERT INTO TASHU_BOARD_LIKE (BOARD_ID, USER_ID, CREATE_DATE)
+        VALUES (#{boardId}, #{userId}, SYSDATE)
+    </insert>
+    
+    <!-- 좋아요 제거 -->
+    <delete id="removeLike">
+        DELETE FROM TASHU_BOARD_LIKE 
+        WHERE BOARD_ID = #{boardId} AND USER_ID = #{userId}
+    </delete>
+    
+    <!-- 사용자가 좋아요했는지 확인 -->
+    <select id="isLikedByUser" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM TASHU_BOARD_LIKE 
+        WHERE BOARD_ID = #{boardId} AND USER_ID = #{userId}
+    </select>
+    
+    <!-- 조회 기록 추가 -->
+    <insert id="insertViewRecord">
+        INSERT INTO TASHU_BOARD_VIEW (VIEW_ID, BOARD_ID, USER_ID, VIEW_DATE, IP_ADDRESS)
+        VALUES (#{viewId}, #{boardId}, #{userId}, SYSDATE, #{ipAddress})
+    </insert>
+    
+    <!-- 오늘 해당 사용자가 이미 조회했는지 확인 -->
+    <select id="hasViewedToday" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM TASHU_BOARD_VIEW 
+        WHERE BOARD_ID = #{boardId} 
+        AND USER_ID = #{userId} 
+        AND TRUNC(VIEW_DATE) = TRUNC(SYSDATE)
+    </select>
+    
+    <!-- 오늘 해당 게시글의 조회 수 -->
+    <select id="countTodayViews" resultType="int">
+        SELECT COUNT(DISTINCT USER_ID)
+        FROM TASHU_BOARD_VIEW 
+        WHERE BOARD_ID = #{boardId} 
+        AND TRUNC(VIEW_DATE) = TRUNC(SYSDATE)
+    </select>
+    
+</mapper>

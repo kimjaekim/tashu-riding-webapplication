@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.future.my.board.dao.IBoardDAO">
+	
+	<select id="getBoardList" resultType="BoardVO">
+		SELECT a.board_no
+		     , a.board_title
+		     , b.mem_id
+		     , b.mem_nm
+		     , TO_CHAR(a.update_dt,'YYYY/MM/DD HH24:MI:SS') as update_dt
+		FROM boards a, members b
+		WHERE a.mem_id = b.mem_id
+		AND   a.use_yn ='Y'
+		ORDER BY a.update_dt DESC
+	</select>
+	
+	<select id="getBoard" parameterType="int" resultType="BoardVO">
+		SELECT a.board_no
+		     , a.board_title
+		     , a.board_content
+		     , b.mem_id
+		     , b.mem_nm
+		     , TO_CHAR(a.update_dt,'YYYY/MM/DD HH24:MI:SS') as update_dt
+		FROM boards a, members b
+		WHERE a.mem_id = b.mem_id
+		AND   a.use_yn ='Y'
+		AND   a.board_no = #{boardNo}
+	
+	</select>
+	<insert id="writeBoard" parameterType="BoardVO">
+		INSERT INTO boards(board_title, board_content, mem_id)
+		VALUES(#{boardTitle}, #{boardContent}, #{memId})
+	</insert>
+	
+	<select id="getReplyList" parameterType="int" resultType="ReplyVO">
+		SELECT a.reply_no
+		     , a.board_no
+		     , b.mem_id
+		     , b.mem_nm
+		     , a.reply_content
+		     , TO_CHAR(a.reply_date, 'MM/DD HH24:MI:SS') as reply_date
+		FROM replys a, members b
+		WHERE a.mem_id = b.mem_id
+		AND a.del_yn = 'N'
+		AND a.board_no = #{boardNo}
+		ORDER BY reply_date DESC
+	</select>
+	<select id="getReply" parameterType="String" resultType="ReplyVO">
+		SELECT a.reply_no
+		     , a.board_no
+		     , b.mem_id
+		     , b.mem_nm
+		     , a.reply_content
+		     , TO_CHAR(a.reply_date, 'MM/DD HH24:MI:SS') as reply_date
+		FROM replys a, members b
+		WHERE a.mem_id = b.mem_id
+		AND a.del_yn = 'N'
+		AND a.reply_no = #{replyNo}
+	</select>	
+	
+	<insert id="writeReply" parameterType="ReplyVO">
+	
+		INSERT INTO replys (reply_no, board_no, mem_id , reply_content) 
+		VALUES (#{replyNo}, #{boardNo}, #{memId}, #{replyContent})
+		
+	</insert>
+	
+	
+</mapper>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.future.my.dao.RideDAO">
+    
+    <!-- 라이딩 기록 삽입 -->
+    <insert id="insertRide" parameterType="com.future.my.vo.RideVO">
+        INSERT INTO TASHU_RIDE (
+            RIDE_ID, USER_ID, START_STATION_ID, END_STATION_ID, 
+            START_TIME, END_TIME, DISTANCE, DURATION, CO2_SAVED, 
+            CALORIES, POINTS, STATUS, CREATE_DATE
+        ) VALUES (
+            #{rideId}, #{userId}, #{startStationId}, #{endStationId},
+            TO_DATE(#{startTime}, 'YYYY-MM-DD HH24:MI:SS'), 
+            TO_DATE(#{endTime}, 'YYYY-MM-DD HH24:MI:SS'), 
+            #{distance}, #{duration}, #{co2Saved},
+            #{calories}, #{points}, #{status}, 
+            TO_DATE(#{createDate}, 'YYYY-MM-DD HH24:MI:SS')
+        )
+    </insert>
+    
+    <!-- 라이딩 기록 ID로 조회 -->
+    <select id="selectRideById" parameterType="string" resultType="com.future.my.vo.RideVO">
+        SELECT * FROM TASHU_RIDE WHERE RIDE_ID = #{rideId}
+    </select>
+    
+    <!-- 사용자별 라이딩 기록 조회 -->
+    <select id="selectRidesByUserId" parameterType="string" resultType="com.future.my.vo.RideVO">
+        SELECT * FROM TASHU_RIDE WHERE USER_ID = #{userId} ORDER BY START_TIME DESC
+    </select>
+    
+    <!-- 라이딩 기록 수정 -->
+    <update id="updateRide" parameterType="com.future.my.vo.RideVO">
+        UPDATE TASHU_RIDE SET
+            END_STATION_ID = #{endStationId},
+            END_TIME = #{endTime},
+            DISTANCE = #{distance},
+            DURATION = #{duration},
+            CO2_SAVED = #{co2Saved},
+            CALORIES = #{calories},
+            POINTS = #{points},
+            STATUS = #{status}
+        WHERE RIDE_ID = #{rideId}
+    </update>
+    
+    <!-- 라이딩 기록 삭제 -->
+    <delete id="deleteRide" parameterType="string">
+        DELETE FROM TASHU_RIDE WHERE RIDE_ID = #{rideId}
+    </delete>
+    
+    <!-- 기간별 라이딩 기록 조회 -->
+    <select id="selectRidesByDateRange" resultType="com.future.my.vo.RideVO">
+        SELECT * FROM TASHU_RIDE 
+        WHERE USER_ID = #{userId} 
+        AND START_TIME BETWEEN #{startDate} AND #{endDate}
+        ORDER BY START_TIME DESC
+    </select>
+    
+    <!-- 사용자 통계 조회 -->
+    <select id="selectUserStats" parameterType="string" resultType="com.future.my.vo.RideVO">
+        SELECT 
+            USER_ID as userId,
+            SUM(DISTANCE) as distance,
+            SUM(DURATION) as duration,
+            SUM(POINTS) as points,
+            COUNT(*) as totalRides,
+            SUM(CO2_SAVED) as co2Saved,
+            SUM(CALORIES) as calories
+        FROM TASHU_RIDE 
+        WHERE USER_ID = #{userId} AND STATUS = 'C'
+        GROUP BY USER_ID
+    </select>
+    
+    
+    <!-- 모든 라이딩 기록 조회 -->
+    <select id="selectAllRides" resultType="com.future.my.vo.RideVO">
+        SELECT * FROM TASHU_RIDE ORDER BY START_TIME DESC
+    </select>
+    
+    <!-- 현재 순위 조회 (상위 50명) - Oracle 호환 수정 -->
+    <select id="selectCurrentRankings" resultType="com.future.my.vo.RideVO">
+        SELECT 
+            userId,
+            points,
+            distance,
+            duration,
+            totalRides,
+            co2Saved,
+            calories,
+            ROW_NUMBER() OVER (ORDER BY points DESC) as currentRank
+        FROM (
+            SELECT 
+                USER_ID as userId,
+                SUM(POINTS) as points,
+                SUM(DISTANCE) as distance,
+                SUM(DURATION) as duration,
+                COUNT(*) as totalRides,
+                SUM(CO2_SAVED) as co2Saved,
+                SUM(CALORIES) as calories
+            FROM TASHU_RIDE 
+            WHERE STATUS = 'C'
+            GROUP BY USER_ID
+        )
+        ORDER BY points DESC
+        FETCH FIRST 50 ROWS ONLY
+    </select>
+    
+    <!-- 사용자 순위 조회 - Oracle 호환 수정 -->
+    <select id="selectUserRanking" parameterType="string" resultType="com.future.my.vo.RideVO">
+        SELECT 
+            userId,
+            points,
+            distance,
+            duration,
+            totalRides,
+            co2Saved,
+            calories,
+            currentRank
+        FROM (
+            SELECT 
+                USER_ID as userId,
+                SUM(POINTS) as points,
+                SUM(DISTANCE) as distance,
+                SUM(DURATION) as duration,
+                COUNT(*) as totalRides,
+                SUM(CO2_SAVED) as co2Saved,
+                SUM(CALORIES) as calories,
+                ROW_NUMBER() OVER (ORDER BY SUM(POINTS) DESC) as currentRank
+            FROM TASHU_RIDE 
+            WHERE STATUS = 'C'
+            GROUP BY USER_ID
+        )
+        WHERE userId = #{userId}
+    </select>
+    
+    <!-- 순위 히스토리 조회 - Oracle 호환 수정 -->
+    <select id="selectRankingHistory" parameterType="string" resultType="com.future.my.vo.RideVO">
+        SELECT 
+            userId,
+            points,
+            distance,
+            duration,
+            totalRides,
+            co2Saved,
+            calories,
+            ROW_NUMBER() OVER (ORDER BY points DESC) as currentRank
+        FROM (
+            SELECT 
+                USER_ID as userId,
+                SUM(POINTS) as points,
+                SUM(DISTANCE) as distance,
+                SUM(DURATION) as duration,
+                COUNT(*) as totalRides,
+                SUM(CO2_SAVED) as co2Saved,
+                SUM(CALORIES) as calories
+            FROM TASHU_RIDE 
+            WHERE STATUS = 'C'
+            AND TO_CHAR(CREATE_DATE, 'YYYY-MM') = #{month}
+            GROUP BY USER_ID
+        )
+        ORDER BY points DESC
+        FETCH FIRST 50 ROWS ONLY
+    </select>
+    
+</mapper>

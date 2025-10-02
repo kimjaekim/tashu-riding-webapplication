@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.future.my.dao.CommentDAO">
+    
+    <!-- 댓글 작성 -->
+    <insert id="insertComment" parameterType="com.future.my.vo.CommentVO">
+        INSERT INTO TASHU_COMMENT (
+            COMMENT_ID, BOARD_ID, USER_ID, CONTENT, STATUS, CREATE_DATE, UPDATE_DATE
+        ) VALUES (
+            #{commentId}, #{boardId}, #{userId}, #{content}, #{status}, 
+            TO_DATE(#{createDate}, 'YYYY-MM-DD HH24:MI:SS'), 
+            TO_DATE(#{updateDate}, 'YYYY-MM-DD HH24:MI:SS')
+        )
+    </insert>
+    
+    <!-- 댓글 ID로 조회 -->
+    <select id="selectCommentById" parameterType="string" resultType="com.future.my.vo.CommentVO">
+        SELECT * FROM TASHU_COMMENT WHERE COMMENT_ID = #{commentId} AND STATUS = 'Y'
+    </select>
+    
+    <!-- 게시글별 댓글 조회 -->
+    <select id="selectCommentsByBoardId" parameterType="string" resultType="com.future.my.vo.CommentVO">
+        SELECT * FROM TASHU_COMMENT 
+        WHERE BOARD_ID = #{boardId} AND STATUS = 'Y' 
+        ORDER BY CREATE_DATE ASC
+    </select>
+    
+    <!-- 사용자별 댓글 조회 -->
+    <select id="selectCommentsByUserId" parameterType="string" resultType="com.future.my.vo.CommentVO">
+        SELECT * FROM TASHU_COMMENT 
+        WHERE USER_ID = #{userId} AND STATUS = 'Y' 
+        ORDER BY CREATE_DATE DESC
+    </select>
+    
+    <!-- 댓글 수정 -->
+    <update id="updateComment" parameterType="com.future.my.vo.CommentVO">
+        UPDATE TASHU_COMMENT SET
+            CONTENT = #{content},
+            STATUS = #{status},
+            UPDATE_DATE = TO_DATE(#{updateDate}, 'YYYY-MM-DD HH24:MI:SS')
+        WHERE COMMENT_ID = #{commentId}
+    </update>
+    
+    <!-- 댓글 삭제 (STATUS를 'N'으로 변경) -->
+    <update id="deleteComment" parameterType="string">
+        UPDATE TASHU_COMMENT SET
+            STATUS = 'N',
+            UPDATE_DATE = SYSDATE
+        WHERE COMMENT_ID = #{commentId}
+    </update>
+    
+    <!-- 댓글 수 조회 -->
+    <select id="countCommentsByBoardId" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM TASHU_COMMENT 
+        WHERE BOARD_ID = #{boardId} AND STATUS = 'Y'
+    </select>
+    
+</mapper>

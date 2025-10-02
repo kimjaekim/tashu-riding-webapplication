@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.future.my.dao.RankingDAO">
+    
+    <!-- 순위 삽입 -->
+    <insert id="insertRanking" parameterType="com.future.my.vo.RankingVO">
+        INSERT INTO TASHU_RANKING (
+            RANKING_ID, USER_ID, RANK_MONTH, TOTAL_DISTANCE, 
+            TOTAL_POINTS, TOTAL_RIDES, RANK_POSITION, CREATE_DATE
+        ) VALUES (
+            #{rankingId}, #{userId}, #{rankMonth}, #{totalDistance},
+            #{totalPoints}, #{totalRides}, #{rankPosition}, #{createDate}
+        )
+    </insert>
+    
+    <!-- 순위 ID로 조회 -->
+    <select id="selectRankingById" parameterType="string" resultType="com.future.my.vo.RankingVO">
+        SELECT * FROM TASHU_RANKING WHERE RANKING_ID = #{rankingId}
+    </select>
+    
+    <!-- 현재 순위 조회 -->
+    <select id="selectCurrentRankings" resultType="com.future.my.vo.RankingVO">
+        SELECT * FROM TASHU_RANKING 
+        WHERE RANK_MONTH = TO_CHAR(SYSDATE, 'YYYY-MM')
+        ORDER BY RANK_POSITION ASC
+    </select>
+    
+    <!-- 월별 순위 조회 -->
+    <select id="selectRankingsByMonth" parameterType="string" resultType="com.future.my.vo.RankingVO">
+        SELECT * FROM TASHU_RANKING 
+        WHERE RANK_MONTH = #{month}
+        ORDER BY RANK_POSITION ASC
+    </select>
+    
+	<!-- 사용자 순위 조회 -->
+	<select id="selectUserRanking" resultType="com.future.my.vo.RankingVO">
+	    SELECT * FROM TASHU_RANKING 
+	    WHERE USER_ID = #{param1} AND RANK_MONTH = #{param2}
+	</select>
+    
+    <!-- 순위 수정 -->
+    <update id="updateRanking" parameterType="com.future.my.vo.RankingVO">
+        UPDATE TASHU_RANKING SET
+            TOTAL_DISTANCE = #{totalDistance},
+            TOTAL_POINTS = #{totalPoints},
+            TOTAL_RIDES = #{totalRides},
+            RANK_POSITION = #{rankPosition}
+        WHERE RANKING_ID = #{rankingId}
+    </update>
+    
+    <!-- 순위 삭제 -->
+    <delete id="deleteRanking" parameterType="string">
+        DELETE FROM TASHU_RANKING WHERE RANKING_ID = #{rankingId}
+    </delete>
+    
+    <!-- 월별 순위 초기화 -->
+    <delete id="resetMonthlyRankings" parameterType="string">
+        DELETE FROM TASHU_RANKING WHERE RANK_MONTH = #{month}
+    </delete>
+    
+    <!-- 모든 순위 조회 -->
+    <select id="selectAllRankings" resultType="com.future.my.vo.RankingVO">
+        SELECT * FROM TASHU_RANKING ORDER BY RANK_MONTH DESC, RANK_POSITION ASC
+    </select>
+    
+</mapper>
