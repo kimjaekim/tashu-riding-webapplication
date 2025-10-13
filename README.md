@@ -542,6 +542,10 @@ useEffect(() => {
 
 ---
 
+## 발표자료
+
+https://drive.google.com/file/d/14c7loXc1rjxEcVBp7UKWDq2NOzN-mE6P/view?usp=sharing
+
 <div align="center">
 
 **⭐ 이 프로젝트가 도움이 되셨다면 Star를 눌러주세요! ⭐**
