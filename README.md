@@ -543,12 +543,10 @@ useEffect(() => {
 ---
 
 ## 발표자료
-
-https://drive.google.com/file/d/14c7loXc1rjxEcVBp7UKWDq2NOzN-mE6P/view?usp=sharing
+[타슈 웹사이트 개발 프로젝트](https://drive.google.com/file/d/16b37pwkw0UA2duDouQauz56unFWhFJKB/view?usp=drive_link)
 
 <div align="center">
 
-**⭐ 이 프로젝트가 도움이 되셨다면 Star를 눌러주세요! ⭐**
 
 Made with ❤️ by kimjaehyeun
 
