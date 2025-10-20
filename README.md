@@ -533,17 +533,8 @@ useEffect(() => {
 
 ---
 
-## 📞 문의 (Contact)
-
-프로젝트에 대한 문의사항이나 제안은 이슈를 등록하거나 이메일로 연락 주세요.
-
-- **Issues**: [GitHub Issues](https://github.com/kimjaekim/tashu-riding-app/issues)
-- **Email**: nicegame9510@gmail.com
-
----
-
-## 발표자료
-[타슈 웹사이트 개발 프로젝트](https://drive.google.com/file/d/16b37pwkw0UA2duDouQauz56unFWhFJKB/view?usp=drive_link)
+## 프로젝트 자료
+[타슈 웹사이트 개발 프로젝트 발표자료](https://drive.google.com/file/d/16b37pwkw0UA2duDouQauz56unFWhFJKB/view?usp=drive_link)
 
 <div align="center">
 
